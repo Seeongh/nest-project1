@@ -19,14 +19,14 @@ export class JwtStrategy extends PassportStrategy(Strategy){
 
     async validate(payload) {   //유효한지 확인이 되면 payload가 전달됨
         const {username} = payload;
-        const user: User = await this.userRepository.findOne(username) ;
+
+        const user: User = await this.userRepository.findOne({username}) ;
 
         if(!user){
+            console.log("ash !!!");
             throw new UnauthorizedException();
         }
-        else{
-            return user;
-        }
+         return user;
 
     }
 }

@@ -5,6 +5,7 @@ import { getConnection, Repository } from 'typeorm';
 import { Board } from './board.entity';
 import { BoardRepository } from './board.repository';
 import { CreateBoardDto } from './dto/create-board.dto';
+import { User } from 'src/auth/user.entity';
 
 @Injectable()
 export class BoardsService {
@@ -23,8 +24,8 @@ export class BoardsService {
         return found ;
     }
 
-    createBoard(createBoardDto : CreateBoardDto) : Promise<Board> {
-        return this.boardRepository.createBoard(createBoardDto);
+    createBoard(createBoardDto : CreateBoardDto , user: User) : Promise<Board> {
+        return this.boardRepository.createBoard(createBoardDto, user);
     }
 
     async deleteBoard(id: number) : Promise<void> {
@@ -45,8 +46,14 @@ export class BoardsService {
         return board ;
     }
 
-    async getAllBoards() : Promise<Board[]> {
-        return await this.boardRepository.find() ; 
+    async getAllBoards(user: User) : Promise<Board[]> {
+        const query = this.boardRepository.createQueryBuilder('board');
+
+        query.where('board.userId = :userId', {userId:user.id});
+
+        const boards = await query.getMany();
+        //return await this.boardRepository.find(user) ; 
+        return boards;
     }
 
     // private boards:Board[] = []; // 다른 component에서 사용 못함
